@@ -1,30 +1,18 @@
 // app/page.tsx
 import Image from 'next/image';
-import localFont from 'next/font/local';
-
-// Load Liberation Sans local font variants
 
 export default function Home() {
   return (
-    <main
-      style={{
-        minHeight: '100vh',
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: 'linear-gradient(to bottom, var(--color-accent), #000)',
-      }}
-    >
+    <main className="font-liberation min-h-screen flex flex-row items-center justify-center bg-gradient-to-b from-[var(--color-accent)] to-black">
       <Image
         src="/assets/movie.svg"
         alt="Movie Icon"
         width={64}
         height={64}
         unoptimized
-        style={{ marginRight: '1rem', filter: 'brightness(0) invert(1)' }}
+        className="mr-4 filter brightness-0 invert"
       />
-      <h1 style={{ color: '#fff', fontSize: '2rem', fontWeight: 700, font: 'Liberation Sans Regular' }}>
+      <h1 className="text-white text-[2rem] font-bold">
         TraileR&apos;ate
       </h1>
     </main>
