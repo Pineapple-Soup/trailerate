@@ -1,0 +1,21 @@
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from app.routes.game import router as game_router
+
+app = FastAPI()
+
+# CORS Middleware (to allow frontend to communicate with backend)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Replace "*" with your frontend URL in production
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Include routers
+app.include_router(game_router, prefix="/game", tags=["Game"])
+
+@app.get("/")
+async def root():
+    return {"message": "Welcome to Trailerate Backend!"}
