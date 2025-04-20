@@ -139,7 +139,8 @@ const Room = () => {
         setRoundEnd(false);
         setCurrentRound(data.data.round);
         console.log("Current round:", data.data.movie);
-        setCurrentMovie(data.data.movie);
+        const movie = data.data.movie as Movie;
+        setCurrentMovie(movie);
         showMessage(`Round ${data.data.round} has started!`);
       }
       if (data.type === "round_end") {
