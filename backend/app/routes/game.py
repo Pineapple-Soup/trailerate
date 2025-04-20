@@ -6,7 +6,7 @@ import logging
 
 # Set up logging
 logger = logging.getLogger("uvicorn.error")
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
 router = APIRouter()
 room_manager = RoomManager()
