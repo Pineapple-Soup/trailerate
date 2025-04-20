@@ -8,8 +8,32 @@ const Room = () => {
   const [roomCode, setRoomCode] = useState("");
   const [username, setUsername] = useState("");
   const [socket, setSocket] = useState<WebSocket | null>(null);
-  const [users, setUsers] = useState<string[]>([]);
+  const [users, setUsers] = useState<Record<string, string>[]>([]);
   // const [messages, setMessages] = useState<string[]>([]);
+
+  const showMessage = (message: string) => {
+    const modal = document.createElement("div");
+    modal.style.position = "fixed";
+    modal.style.bottom = "20px";
+    modal.style.right = "20px";
+    modal.style.backgroundColor = "rgba(0, 0, 0, 0.8)";
+    modal.style.color = "white";
+    modal.style.padding = "10px 20px";
+    modal.style.borderRadius = "8px";
+    modal.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.1)";
+    modal.style.zIndex = "1000";
+    modal.textContent = message;
+
+    document.body.appendChild(modal);
+
+    setTimeout(() => {
+      modal.style.transition = "opacity 0.5s";
+      modal.style.opacity = "0";
+      setTimeout(() => {
+        document.body.removeChild(modal);
+      }, 500);
+    }, 3000);
+  };
 
   useEffect(() => {
     const code = window.location.pathname.split("/").pop() || "";
@@ -22,7 +46,7 @@ const Room = () => {
     )
       .then((response) => {
         if (!response.ok) {
-          router.push("/");
+          // router.push("/");
           throw new Error("Failed to validate room code");
         }
         return response.json();
@@ -40,7 +64,7 @@ const Room = () => {
         console.error(error);
         // Handle validation error (e.g., show an error message)
       });
-  }, []);
+  }, [roomCode, router]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,6 +90,7 @@ const Room = () => {
       console.log("Socket message received:", data);
       console.log("Connected users:", data.data.connected_users);
       setUsers(data.data.connected_users);
+      showMessage(data.data.message);
       // Message that all a user has joined
       // setMessages((prevMessages) => [...prevMessages, data.message]);
     };
@@ -73,7 +98,7 @@ const Room = () => {
 
   return (
     <div className='font-liberation flex flex-col items-center justify-center min-h-screen bg-gradient-to-t to-accent from-black text-white px-4'>
-      {!users.length && (
+      {!users.length ? (
         <div>
           <div>Join the Room!</div>
           <form onSubmit={handleSubmit} className='flex items-center space-x-4'>
@@ -90,16 +115,19 @@ const Room = () => {
             </button>
           </form>
         </div>
+      ) : (
+        <div className='mt-8'>
+          <h2 className='text-lg font-bold'>Connected Users:</h2>
+          <ul className='list-disc list-inside'>
+            {users.map((user, index) => (
+              <li key={index} className='font-liberation font-bold flex'>
+                {index + 1}. {user.player_name} -{" "}
+                {user.status == "not_ready" ? "WAITING" : "READY"}{" "}
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
-
-      <div className='mt-8'>
-        <h2 className='text-lg font-bold'>Connected Users:</h2>
-        <ul className='list-disc list-inside'>
-          {users.map((user, index) => (
-            <li key={index}>{user}</li>
-          ))}
-        </ul>
-      </div>
     </div>
   );
 };
