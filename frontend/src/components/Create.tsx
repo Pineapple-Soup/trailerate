@@ -3,7 +3,7 @@ import { ButtonProps } from "@/types/ButtonProps";
 
 const Create = ({ label }: ButtonProps) => {
   const createRoom = () => {
-    fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/rooms/create`, {
+    fetch(`https://${process.env.NEXT_PUBLIC_BACKEND_URL}/rooms/create`, {
       method: "POST",
     })
       .then((response) => {

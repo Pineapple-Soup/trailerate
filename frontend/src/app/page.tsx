@@ -18,9 +18,12 @@ export default function Home() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/rooms/validate/${roomCode}`, {
-      method: "GET",
-    })
+    fetch(
+      `https://${process.env.NEXT_PUBLIC_BACKEND_URL}/rooms/validate/${roomCode}`,
+      {
+        method: "GET",
+      }
+    )
       .then((response) => {
         if (!response.ok) {
           showError("Failed to validate room code");
