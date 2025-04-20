@@ -1,6 +1,7 @@
 from random import randint
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from app.utils.websocket import RoomManager
+from app.utils.db_utils import get_random_movie
 
 import logging
 
@@ -45,12 +46,6 @@ async def validate_room(room_code: str):
     else:
         return {"exists": False}
 
-@router.get("/all")
-async def get_all_rooms():
-    """
-    Get a list of all rooms and their current states.
-    """
-    return room_manager.rooms
 
 @router.websocket("/join")
 async def websocket_endpoint(websocket: WebSocket):
