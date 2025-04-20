@@ -1,27 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import YoutubeEmbed from "@/components/YouTubeEmbed";
+import { Movie } from "@/types/Movie";
 
 const totalRounds = 3;
-
-const movies = [
-  {
-    title: "Movie 1",
-    trailerLink: "dQw4w9WgXcQ",
-    actualScore: 85,
-  },
-  {
-    title: "Movie 2",
-    trailerLink: "jan5CFWs9ic",
-    actualScore: 90,
-  },
-  {
-    title: "Movie 3",
-    trailerLink: "pAsmrKyMqaA",
-    actualScore: 75,
-  },
-];
 
 const Play = () => {
   const [round, setRound] = useState(1);
@@ -30,13 +13,35 @@ const Play = () => {
   const [totalScore, setTotalScore] = useState(0);
   const [submitted, setSubmitted] = useState(false);
   const [gameOver, setGameOver] = useState(false);
+  const [currentMovie, setCurrentMovie] = useState<Movie | null>(null);
 
-  const currentMovie = movies[round - 1];
+  // Fetch a new movie when the round changes (only if not already submitted)
+  useEffect(() => {
+    const fetchMovie = async () => {
+      try {
+        const res = await fetch("/api/random");
+        const data = await res.json();
+        setCurrentMovie(data);
+      } catch (err) {
+        console.error("Failed to fetch movie:", err);
+      }
+    };
+
+    if (!submitted && !gameOver) {
+      fetchMovie();
+    }
+  }, [round, submitted, gameOver]);
 
   const handleSubmit = () => {
     const guessNum = parseInt(guess);
     if (isNaN(guessNum) || guessNum < 0 || guessNum > 100) return;
-    const score = 100 - Math.abs(currentMovie.actualScore - guessNum);
+
+    const imdbRating = parseFloat(currentMovie?.imdb_rating || "0");
+    if (isNaN(imdbRating)) return;
+
+    const actualScore = Math.round(imdbRating * 10);
+    const score = 100 - Math.abs(actualScore - guessNum);
+
     setRoundScore(score);
     setTotalScore((prevTotalScore) => prevTotalScore + score);
     setSubmitted(true);
@@ -46,24 +51,41 @@ const Play = () => {
     if (round === totalRounds) {
       setGameOver(true);
     } else {
-      setRound(round + 1);
+      setRound((prev) => prev + 1);
       setGuess("");
       setSubmitted(false);
     }
   };
 
+  const getVideoId = (url: string): string | null => {
+    const match = url?.match(/v=([^&]+)/);
+    return match ? match[1] : null;
+  };
+
+  if (!currentMovie) {
+    return (
+      <div className='font-liberation flex items-center justify-center h-screen bg-gradient-to-t to-accent text-white'>
+        Loading trailer...
+      </div>
+    );
+  }
+
+  const videoId = getVideoId(currentMovie.youtube_url);
+  const actualScore = Math.round(
+    parseFloat(currentMovie?.imdb_rating || "0") * 10
+  );
+
   return (
-    <div className='font-liberation flex flex-col items-center justify-center h-screen bg-gradient-to-t to-accent'>
+    <div className='font-liberation flex flex-col items-center justify-center min-h-screen bg-gradient-to-t to-accent from-black text-white px-4'>
       {!gameOver && (
         <div className='flex flex-col items-center'>
           <h1 className='text-4xl font-bold mb-4'>
-            {" "}
-            Round {round}/{totalRounds}{" "}
+            Round {round}/{totalRounds}
           </h1>
           <h2 className='text-2xl mb-4'>
             Guess the score of {currentMovie.title}
           </h2>
-          <YoutubeEmbed videoId={currentMovie.trailerLink} />{" "}
+          {videoId && <YoutubeEmbed videoId={videoId} />}
         </div>
       )}
 
@@ -87,7 +109,11 @@ const Play = () => {
       {submitted && !gameOver && (
         <div className='flex flex-col justify-center items-center mt-6'>
           <p className='text-xl'>You Guessed: {guess}%</p>
-          <p className='text-xl'>Actual Score: {currentMovie.actualScore}%</p>
+          <p className='text-xl'>Actual Score: {actualScore}%</p>
+          {/* <p className='text-xl'>
+            Actual Score: {Math.round(currentMovie.imdb_rating * 10)}%
+          </p> */}
+
           <p className='text-lg'>You earned {roundScore} points this round.</p>
           <button
             onClick={nextRound}
