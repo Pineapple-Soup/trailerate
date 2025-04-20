@@ -22,7 +22,7 @@ class RoomManager:
         """Initialize a new room."""
         self.rooms[room_code] = {
             "rounds": 5,  # Total rounds in the game
-            "current_round": 1,  # Start at round 1
+            "current_round": 0,  # Start at round 1
             "players": {},  # Players and their scores
             "guesses": [],  # Guesses for the current round
             "ready_players": set(),  # Players who clicked "Ready"
@@ -110,6 +110,8 @@ class RoomManager:
         room["ready_players"] = set()
         room["guesses"] = []
 
+        await self.start_next_round(room_code)
+
     async def mark_player_ready(self, room_code: str, player_name: str):
         """Mark a player as ready for the next round."""
         room = self.rooms[room_code]
@@ -143,9 +145,21 @@ class RoomManager:
             )
             return
 
+        await self.broadcast(
+            {"type": "countdown", "data": {"message": "Next round starts in 5 seconds..."}},
+            room_code,
+        )
+
+        # Wait for 5 seconds
+        await asyncio.sleep(5)
+
+        # Start the next round
         room["current_movie"] = self.movie_data
         room["current_round"] += 1
         room["guesses"] = []  # Reset guesses for the new round
 
         # Broadcast start of next round
-        await self.broadcast({"type": "round_start", "data": {"round": room["current_round"]}, "movie_data": self.movie_data}, room_code)
+        await self.broadcast(
+            {"type": "round_start", "data": {"round": room["current_round"]}, "movie_data": self.movie_data},
+            room_code,
+        )
