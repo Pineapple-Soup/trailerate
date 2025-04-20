@@ -1,70 +1,49 @@
 'use client';
 import { useEffect, useState } from 'react';
-// app/page.tsx
-import Image from "next/image";
 
 export default function Home() {
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [title, setTitle] = useState<string | null>(null);
-  const [videoId, setVideoId] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchTrailer = async () => {
-      try {
-        const res = await fetch('/api/random');
-        const data = await res.json();
-
+    fetch('/api/random')
+      .then(res => res.json())
+      .then(data => {
         setTitle(data.title);
-        const url = data.youtube_url;
-        const match = url?.match(/v=([^&]+)/);
-        if (match) {
-          setVideoId(match[1]);
-        }
-      } catch (err) {
-        console.error("Failed to fetch trailer:", err);
-      }
-    };
-
-    fetchTrailer();
+        setVideoUrl(data.youtube_url);
+      });
   }, []);
 
+  const getVideoId = (url: string): string | null => {
+    const match = url.match(/v=([^&]+)/);
+    return match ? match[1] : null;
+  };
+
+  const videoId = videoUrl ? getVideoId(videoUrl) : null;
+
   return (
-<!--     <main className='font-liberation min-h-screen flex flex-row items-center justify-center bg-gradient-to-t to-accent'>
-      <Image
-        src='/assets/movie.svg'
-        alt='Movie Icon'
-        width={64}
-        height={64}
-        unoptimized
-        className='mr-4 filter brightness-0 invert'
-      />
-      <h1 className='text-white text-[2rem] font-bold'>TraileR&apos;ate</h1> -->
-    <main
-      style={{
-        minHeight: '100vh',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: '#000',
-        color: '#fff',
-        padding: '2rem',
-        textAlign: 'center',
-      }}
-    >
-      <h1 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '1rem' }}>TraileR&apos;ate</h1>
-      {title && <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>{title}</h2>}
-      {videoId ? (
+    <main style={{
+      minHeight: '100vh',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: '#000',
+      color: '#fff'
+    }}>
+      <h1 style={{ fontSize: '2rem', fontWeight: 700 }}>TraileR&apos;ate</h1>
+      {title && <h2>{title}</h2>}
+      {videoId && (
         <iframe
           width="560"
           height="315"
-          src={`https://www.youtube.com/embed/${videoId}?autoplay=1&controls=1`}
+          src={`https://www.youtube.com/embed/${videoId}`}
           title="YouTube trailer"
           frameBorder="0"
           allow="autoplay; encrypted-media"
           allowFullScreen
+          style={{ marginTop: '1rem' }}
         />
-      ) : (
-        <p>Loading trailer...</p>
       )}
     </main>
   );
