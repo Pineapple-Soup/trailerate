@@ -1,11 +1,13 @@
 import asyncio
 from collections import defaultdict
+from app.utils.db_utils import get_random_movie
+
 
 class RoomManager:
     def __init__(self):
         self.rooms = {}  # Stores room states
         self.connections = defaultdict(list)  # Stores WebSocket connections per room
-        self.movie_data = {
+        self.mock_movie_data = {
             "title": "Inception",
             "year": 2010,
             "director": "Christopher Nolan",
@@ -144,6 +146,16 @@ class RoomManager:
                 room_code,
             )
             return
+        
+        # Fetch a random movie
+        try:
+            movie_data = get_random_movie()
+        except ValueError as e:
+            await self.broadcast(
+                {"type": "error", "data": {"message": str(e)}},
+                room_code,
+            )
+            return
 
         await self.broadcast(
             {"type": "countdown", "data": {"message": "Next round starts in 5 seconds..."}},
@@ -154,12 +166,12 @@ class RoomManager:
         await asyncio.sleep(5)
 
         # Start the next round
-        room["current_movie"] = self.movie_data
+        room["current_movie"] = movie_data
         room["current_round"] += 1
         room["guesses"] = []  # Reset guesses for the new round
 
         # Broadcast start of next round
         await self.broadcast(
-            {"type": "round_start", "data": {"round": room["current_round"]}, "movie_data": self.movie_data},
+            {"type": "round_start", "data": {"round": room["current_round"]}, "movie_data": movie_data},
             room_code,
         )
