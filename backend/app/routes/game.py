@@ -56,10 +56,10 @@ async def websocket_endpoint(websocket: WebSocket):
         while True:
             message = await websocket.receive_json()
             msg_type = message.get("type")
-            data = message.get("data", {})
+
 
             if msg_type == "guess":
-                guess = data.get("guess")
+                guess =  message.get("guess")
                 if guess is None:
                     await websocket.close(code=4002, reason="Invalid guess")
                     logger.warning(f"WebSocket closed: Invalid guess from {player_name}")
@@ -73,7 +73,7 @@ async def websocket_endpoint(websocket: WebSocket):
 
             else:
                 await room_manager.broadcast(
-                    {"type": "broadcast", "data": {"message": f"{player_name} says: {data.get('text', '')}"}},
+                    {"type": "broadcast", "data": {"message": f"{player_name} says: {message.get('text', '')}"}},
                     room_code,
                 )
 

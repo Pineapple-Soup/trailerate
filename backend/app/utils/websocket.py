@@ -10,7 +10,8 @@ class RoomManager:
             "year": 2010,
             "director": "Christopher Nolan",
             "actors": ["Leonardo DiCaprio", "Joseph Gordon-Levitt", "Elliot Page"],
-            "trailer_url": "https://www.youtube.com/watch?v=YoHD9XEInc0"
+            "trailer_url": "https://www.youtube.com/watch?v=YoHD9XEInc0",
+            "score": 85
         }
 
     async def room_exists(self, room_code: str) -> bool:
@@ -73,15 +74,24 @@ class RoomManager:
     async def end_round(self, room_code: str):
         """End the current round and calculate scores."""
         room = self.rooms[room_code]
-        correct_score = 7.5  # Replace with actual IMDb score logic
+        correct_score = room["current_movie"]["score"]
         scores = []
 
         for guess in room["guesses"]:
             player_name = guess["player"]
             guess_value = guess["guess"]
-            score = max(0, 100 - abs(correct_score - guess_value) * 10)
-            room["players"][player_name] += score
-            scores.append({"player": player_name, "guess": guess_value, "score": score})
+            this_score = 100 - abs(correct_score - guess_value)
+            room["players"][player_name] += this_score
+            scores.append({
+                "player": player_name,
+                "guess": guess_value,
+                "increment": this_score,
+                "total_score": room["players"][player_name] # AFTER incrementing
+            })
+        
+        room["players"] = {player: total_score for player, total_score in room["players"].items() if total_score > 0}
+        # Sort scores in descending order
+        scores.sort(key=lambda x: x["total_score"], reverse=True)
 
         # Broadcast results
         await self.broadcast(
@@ -90,7 +100,7 @@ class RoomManager:
                 "data": {
                     "message": "Round ended!",
                     "correct_score": correct_score,
-                    "scores": scores,
+                    "scores": room["players"],
                 },
             },
             room_code,
@@ -98,6 +108,7 @@ class RoomManager:
 
         # Reset ready players for the next round
         room["ready_players"] = set()
+        room["guesses"] = []
 
     async def mark_player_ready(self, room_code: str, player_name: str):
         """Mark a player as ready for the next round."""
@@ -132,6 +143,7 @@ class RoomManager:
             )
             return
 
+        room["current_movie"] = self.movie_data
         room["current_round"] += 1
         room["guesses"] = []  # Reset guesses for the new round
 
