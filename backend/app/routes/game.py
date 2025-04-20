@@ -22,6 +22,18 @@ async def create_room():
             await room_manager.create_room(room_id)
             logger.info(f"Created room {room_id}")
             return {"room_id": room_id}
+
+@router.delete("/delete/{room_code}")
+async def delete_room(room_code: str): 
+    """
+    Delete a room with the given code.
+    """
+    if await room_manager.room_exists(room_code):
+        del room_manager.rooms[room_code]
+        logger.info(f"Deleted room {room_code}")
+        return {"message": "Room deleted successfully"}
+    else:
+        return {"message": "Room not found"}
         
 @router.get("/validate/{room_code}")
 async def validate_room(room_code: str):
