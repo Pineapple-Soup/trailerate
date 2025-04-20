@@ -33,7 +33,7 @@ class RoomManager:
 
         # Notify all players that a new player has joinesd
         await self.broadcast(
-            {"type": "broadcast", "data": {"message": f"{username} has joined room {room_code}!"}, "connected_users": list(self.rooms[room_code]["players"].keys())},
+            {"type": "user_join", "data": {"message": f"{username} has joined room {room_code}!"}, "connected_users": list(self.rooms[room_code]["players"].keys())},
             room_code,
         )
 
@@ -97,6 +97,19 @@ class RoomManager:
         room = self.rooms[room_code]
         room["ready_players"].add(player_name)
 
+        # await self.broadcast(
+        #     {"type": "user_ready", "data": {"message": f"{player_name} is ready for the next round!", "ready_players": list(room["ready_players"])}},
+        #     room_code,
+        # )
+
+        all_players = [{"player_name": player, "status": "ready" if player in room["ready_players"] else "not_ready"} for player in room["players"].keys()]
+        
+        await self.broadcast(
+            {"type": "user_ready", "data": {"message": f"{player_name} is ready for the next round!", "players": all_players}},
+            room_code
+        )
+
+
         # Check if all players are ready
         if len(room["ready_players"]) == len(room["players"]):
             await self.start_next_round(room_code)
@@ -106,7 +119,7 @@ class RoomManager:
         room = self.rooms[room_code]
         if room["current_round"] >= room["rounds"]:
             await self.broadcast(
-                {"type": "broadcast", "data": {"message": "Game over! Final scores will be displayed."}},
+                 {"type": "game_end", "data": {"message": "Game over! Final scores will be displayed."}},
                 room_code,
             )
             return
