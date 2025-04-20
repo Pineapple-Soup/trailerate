@@ -46,12 +46,6 @@ async def validate_room(room_code: str):
     else:
         return {"exists": False}
 
-@router.get("/random_movie")
-async def random_movie():
-    """
-    Fetch a random movie from the SQLite database and its trailer URL.
-    """
-    return get_random_movie()
 
 @router.websocket("/join")
 async def websocket_endpoint(websocket: WebSocket):
