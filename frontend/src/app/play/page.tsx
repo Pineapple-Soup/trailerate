@@ -101,7 +101,19 @@ const Play = () => {
   );
 
   return (
-    <div className='font-liberation flex flex-col items-center justify-center min-h-screen bg-gradient-to-t to-accent from-black text-white px-4'>
+    
+    // <div className='font-liberation flex flex-col items-center justify-center min-h-screen bg-gradient-to-t to-accent text-white px-4'>
+    <div
+      className="relative z-10 p-8 rounded-xl w-full max-w-xl mx-auto mt-12 text-center"
+      style={{
+        background: "rgba(255, 255, 255, 0.1)",
+        borderRadius: "16px",
+        boxShadow: "0 4px 30px rgba(0, 0, 0, 0.1)",
+        backdropFilter: "blur(8px)",
+        WebkitBackdropFilter: "blur(8px)",
+        border: "1px solid rgba(255, 255, 255, 0.2)",
+      }}
+    >
       {!gameOver && (
         <div className='flex flex-col items-center'>
           <h1 className='text-4xl font-bold mb-4'>
@@ -130,7 +142,7 @@ const Play = () => {
           </button>
           <button
             onClick={skipRound}
-            className='mt-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600'>
+            className='mt-4 ml-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600'>
             Skip
           </button>
         </div>
