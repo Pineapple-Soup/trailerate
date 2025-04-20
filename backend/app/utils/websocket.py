@@ -136,7 +136,7 @@ class RoomManager:
 
         # Check if all players are ready
         if len(room["ready_players"]) == len(room["players"]):
-            room["ready_players"] = set() # reset everyone to unready
+            # room["ready_players"] = set() # reset everyone to unready
             await self.start_next_round(room_code)
 
     async def start_next_round(self, room_code: str):
@@ -165,7 +165,7 @@ class RoomManager:
         )
 
         # Wait for 5 seconds
-        await asyncio.sleep(5)
+        # await asyncio.sleep(5)
 
         # Start the next round
         room["current_movie"] = movie_data
