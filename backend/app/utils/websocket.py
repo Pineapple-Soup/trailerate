@@ -6,6 +6,9 @@ class RoomManager:
         self.rooms = defaultdict(dict)  # Stores room states
         self.connections = defaultdict(list)  # Stores WebSocket connections per room
 
+    async def room_exists(self, room_id: str):
+        return room_id in self.rooms
+
     async def create_room(self, room_id: str):
         """
         Initialize a new room with 5 rounds and an empty player list.
@@ -17,7 +20,7 @@ class RoomManager:
             "guesses": [],  # Guesses for the current round
         }
 
-    async def connect(self, websocket, room_id: str):
+    async def connect(self, websocket, room_id: str, username: str):
         """
         Add a WebSocket connection to the specified room.
         """
@@ -29,7 +32,7 @@ class RoomManager:
         await websocket.accept()
 
         # Notify all players that a new player has joined
-        await self.broadcast(f"A new player has joined room {room_id}!", room_id)
+        await self.broadcast(f"{username} has joined room {room_id}!", room_id)
 
     async def disconnect(self, websocket, room_id: str):
         """

@@ -1,3 +1,4 @@
+from random import randint
 from fastapi import APIRouter, WebSocket
 from uuid import uuid4
 from app.utils.websocket import RoomManager
@@ -10,16 +11,21 @@ async def create_room():
     """
     Create a new room, generate a unique ID, and initialize the room state.
     """
-    room_id = str(uuid4())  # Generate a unique room ID
-    await room_manager.create_room(room_id)
-    return {"room_id": room_id}
+    while 1:
+        room_id = f"{randint(1000, 9999)}"
+        if not await room_manager.room_exists(room_id):
+            await room_manager.create_room(room_id)
+            return {"room_id": room_id}
 
 @router.websocket("/ws/connect/{room_id}")
-async def websocket_endpoint(websocket: WebSocket, room_id: str):
+async def websocket_endpoint(websocket: WebSocket, room_id: str, username: str):
     """
     WebSocket endpoint for players to join a room and receive updates.
     """
-    await room_manager.connect(websocket, room_id)
+    if not await room_manager.room_exists(room_id):
+        await websocket.close(code=4000, reason="Room does not exist")
+        return
+    await room_manager.connect(websocket, room_id, username)
 
     try:
         while True:
