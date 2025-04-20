@@ -78,7 +78,7 @@ class RoomManager:
     async def end_round(self, room_code: str):
         """End the current round and calculate scores."""
         room = self.rooms[room_code]
-        correct_score = room["current_movie"]["rating"]
+        correct_score = room["current_movie"]["imdb_rating"]
         scores = []
 
         for guess in room["guesses"]:
