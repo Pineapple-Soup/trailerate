@@ -5,6 +5,7 @@ import YoutubeEmbed from "@/components/YouTubeEmbed";
 import { Movie } from "@/types/Movie";
 import Link from "next/link";
 
+
 const totalRounds = 3;
 
 const Play = () => {
@@ -56,6 +57,15 @@ const Play = () => {
       setGuess("");
       setSubmitted(false);
     }
+  };
+
+  const skipRound = async () => {
+      const res = await fetch("/api/random");
+      const data = await res.json();
+      setCurrentMovie(data);
+      setGuess("");         
+      setSubmitted(false);  
+      setRoundScore(0);     
   };
 
   const replayGame = () => {
@@ -113,6 +123,11 @@ const Play = () => {
             onClick={handleSubmit}
             className='ml-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600'>
             Submit
+          </button>
+          <button
+            onClick={skipRound}
+            className='mt-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600'>
+            Skip
           </button>
         </div>
       )}
