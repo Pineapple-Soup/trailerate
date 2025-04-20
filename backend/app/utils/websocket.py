@@ -39,11 +39,13 @@ class RoomManager:
         # Add player to room state and initialize their score
         self.rooms[room_code]["players"][username] = 0
         self.connections[room_code].append(websocket)
+        room = self.rooms[room_code]
 
 
         # Notify all players that a new player has joinesd
+        all_players = [{"player_name": player, "status": "ready" if player in room["ready_players"] else "not_ready"} for player in room["players"].keys()]
         await self.broadcast(
-            {"type": "user_join", "data": {"user": username, "message": f"{username} has joined room {room_code}!", "connected_users": list(self.rooms[room_code]["players"].keys())}},
+            {"type": "user_join", "data": {"user": username, "message": f"{username} has joined room {room_code}!", "connected_users": all_players}},
             room_code,
         )
 
