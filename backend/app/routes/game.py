@@ -56,10 +56,11 @@ async def websocket_endpoint(websocket: WebSocket):
         while True:
             message = await websocket.receive_json()
             msg_type = message.get("type")
+            data = message.get("data")
 
 
             if msg_type == "guess":
-                guess =  message.get("guess")
+                guess =  data.get("guess")
                 if guess is None:
                     await websocket.close(code=4002, reason="Invalid guess")
                     logger.warning(f"WebSocket closed: Invalid guess from {player_name}")
