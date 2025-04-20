@@ -3,12 +3,16 @@
 import { useEffect, useState } from "react";
 
 const Room = () => {
+  const [roomCode, setRoomCode] = useState("");
   const [username, setUsername] = useState("");
   const [socket, setSocket] = useState<WebSocket | null>(null);
   const [users, setUsers] = useState<string[]>([]);
   // const [messages, setMessages] = useState<string[]>([]);
 
-  const roomCode = window.location.pathname.split("/").pop();
+  useEffect(() => {
+    const code = window.location.pathname.split("/").pop() || "";
+    setRoomCode(code);
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
