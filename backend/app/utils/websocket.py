@@ -5,6 +5,13 @@ class RoomManager:
     def __init__(self):
         self.rooms = {}  # Stores room states
         self.connections = defaultdict(list)  # Stores WebSocket connections per room
+        self.movie_data = {
+            "title": "Inception",
+            "year": 2010,
+            "director": "Christopher Nolan",
+            "actors": ["Leonardo DiCaprio", "Joseph Gordon-Levitt", "Elliot Page"],
+            "trailer_url": "https://www.youtube.com/watch?v=YoHD9XEInc0"
+        }
 
     async def room_exists(self, room_code: str) -> bool:
         """Check if a room with the given code exists."""
@@ -103,7 +110,7 @@ class RoomManager:
         # )
 
         all_players = [{"player_name": player, "status": "ready" if player in room["ready_players"] else "not_ready"} for player in room["players"].keys()]
-        
+
         await self.broadcast(
             {"type": "user_ready", "data": {"message": f"{player_name} is ready for the next round!", "players": all_players}},
             room_code
@@ -112,6 +119,7 @@ class RoomManager:
 
         # Check if all players are ready
         if len(room["ready_players"]) == len(room["players"]):
+            room["ready_players"] = set() # reset everyone to unready
             await self.start_next_round(room_code)
 
     async def start_next_round(self, room_code: str):
@@ -128,7 +136,4 @@ class RoomManager:
         room["guesses"] = []  # Reset guesses for the new round
 
         # Broadcast start of next round
-        await self.broadcast(
-            {"type": "broadcast", "data": {"message": f"Starting round {room['current_round']}!"}},
-            room_code,
-        )
+        await self.broadcast({"type": "round_start", "data": {"round": room["current_round"]}, "movie_data": self.movie_data}, room_code)
