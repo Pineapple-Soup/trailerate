@@ -21,7 +21,7 @@ const Play = () => {
   useEffect(() => {
     const fetchMovie = async () => {
       try {
-        const res = await fetch(process.env.NEXT_PUBLIC_BACKEND_URL + "/random_movie");
+        const res = await fetch("https://" + process.env.NEXT_PUBLIC_BACKEND_URL + "/random_movie");
         // const res = await fetch("http://localhost:8000/random_movie");
         const data = await res.json();
         console.log(data)
