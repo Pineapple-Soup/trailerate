@@ -63,7 +63,8 @@ const Play = () => {
   };
 
   const skipRound = async () => {
-      const res = await fetch("/api/random");
+      // const res = await fetch("/api/random");
+      const res = await fetch("https://" + process.env.NEXT_PUBLIC_BACKEND_URL + "/random_movie");
       const data = await res.json();
       setCurrentMovie(data);
       setGuess("");         
