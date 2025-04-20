@@ -14,7 +14,7 @@ app.add_middleware(
 )
 
 # Include routers
-app.include_router(game_router, prefix="/game", tags=["Game"])
+app.include_router(game_router, prefix="/rooms", tags=["Room"])
 
 @app.get("/")
 async def root():
