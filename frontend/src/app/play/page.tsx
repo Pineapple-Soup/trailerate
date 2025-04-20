@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import YoutubeEmbed from "@/components/YouTubeEmbed";
 import { Movie } from "@/types/Movie";
+import Link from "next/link";
 
 const totalRounds = 3;
 
@@ -55,6 +56,16 @@ const Play = () => {
       setGuess("");
       setSubmitted(false);
     }
+  };
+
+  const replayGame = () => {
+    setRound(1);
+    setGuess("");
+    setRoundScore(0);
+    setTotalScore(0);
+    setSubmitted(false);
+    setGameOver(false);
+    setCurrentMovie(null); 
   };
 
   const getVideoId = (url: string): string | null => {
@@ -127,8 +138,22 @@ const Play = () => {
         <div className='flex flex-col justify-center items-center mt-6'>
           <h2 className='text-3xl font-bold'>Game Over!</h2>
           <p className='text-xl mt-2'>Your total score: {totalScore}</p>
+          <div className='flex flex-col items-center justify-center gap-4 mt-4'>
+            <button
+              onClick={replayGame}
+              className='flex items-center justify-center rounded-md px-4 py-2 bg-accent hover:bg-white hover:text-accent font-bold'>
+              Replay
+            </button>
+            <Link
+              href="/"
+              className='flex items-center justify-center rounded-md px-4 py-2 bg-accent hover:bg-white hover:text-accent font-bold'
+            >
+              Main Menu
+            </Link>
+          </div>
         </div>
       )}
+
     </div>
   );
 };
