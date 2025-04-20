@@ -5,34 +5,34 @@
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url('../public/assets/liberation_sans/LiberationSans-BoldItalic.ttf') format('truetype');
+  src: url('../../public/assets/liberation_sans/LiberationSans-BoldItalic.ttf') format('truetype');
 }
 @font-face {
   font-family: 'Liberation Sans Bold';
   font-style: italic;
   font-weight: 400;
   font-display: swap;
-  src: url('../public/assets/liberation_sans/LiberationSans-Bold.ttf') format('truetype');
+  src: url('../../public/assets/liberation_sans/LiberationSans-Bold.ttf') format('truetype');
 }
 @font-face {
   font-family: 'Liberation Sans Bold Italic';
   font-style: normal;
   font-weight: 700;
   font-display: swap;
-  src: url('../public/assets/liberation_sans/LiberationSans-Italic.ttf') format('truetype');
+  src: url('../../public/assets/liberation_sans/LiberationSans-Italic.ttf') format('truetype');
 }
 @font-face {
   font-family: 'Liberation Sans Regular';
   font-style: italic;
   font-weight: 700;
   font-display: swap;
-  src: url('../public/assets/liberation_sans/LiberationSans-Regular.ttf') format('truetype');
+  src: url('../../public/assets/liberation_sans/LiberationSans-Regular.ttf') format('truetype');
 }
 
 :root {
   --background: #ffffff;
   --foreground: #171717;
-  --color-subtle-red: rgba(255, 0, 0, 0.2);
+  --color-subtle-red: rgb(59, 20, 20);
   --font-sans: 'Liberation Sans', sans-serif;
 }
 
