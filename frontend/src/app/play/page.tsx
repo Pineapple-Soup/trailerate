@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import YoutubeEmbed from "@/components/YouTubeEmbed";
 
 const totalRounds = 3;
@@ -36,7 +36,7 @@ const Play = () => {
   const handleSubmit = () => {
     const guessNum = parseInt(guess);
     if (isNaN(guessNum) || guessNum < 0 || guessNum > 100) return;
-    let score = 100 - Math.abs(currentMovie.actualScore - guessNum);
+    const score = 100 - Math.abs(currentMovie.actualScore - guessNum);
     setRoundScore(score);
     setTotalScore((prevTotalScore) => prevTotalScore + score);
     setSubmitted(true);
