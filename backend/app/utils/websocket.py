@@ -33,7 +33,7 @@ class RoomManager:
 
         # Notify all players that a new player has joinesd
         await self.broadcast(
-            {"type": "broadcast", "data": {"message": f"{username} has joined room {room_code}!"}},
+            {"type": "broadcast", "data": {"message": f"{username} has joined room {room_code}!"}, "connected_users": list(self.rooms[room_code]["players"].keys())},
             room_code,
         )
 
