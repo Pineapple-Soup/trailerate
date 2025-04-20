@@ -1,8 +1,10 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const Room = () => {
+  const router = useRouter();
   const [roomCode, setRoomCode] = useState("");
   const [username, setUsername] = useState("");
   const [socket, setSocket] = useState<WebSocket | null>(null);
@@ -12,6 +14,32 @@ const Room = () => {
   useEffect(() => {
     const code = window.location.pathname.split("/").pop() || "";
     setRoomCode(code);
+    fetch(
+      `https://${process.env.NEXT_PUBLIC_BACKEND_URL}/rooms/validate/${roomCode}`,
+      {
+        method: "GET",
+      }
+    )
+      .then((response) => {
+        if (!response.ok) {
+          router.push("/");
+          throw new Error("Failed to validate room code");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        if (!data.exists) {
+          router.push("/");
+          throw new Error("Invalid room code");
+        }
+        console.log("Room validated:", data);
+        // Handle successful validation (e.g., navigate to the room)
+        // window.location.href = `/room/${roomCode}`;
+      })
+      .catch((error) => {
+        console.error(error);
+        // Handle validation error (e.g., show an error message)
+      });
   }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
