@@ -20,7 +20,11 @@ async function fetchYouTubeTrailer(title: string): Promise<string | null> {
   return null;
 }
 
-function getRandomMovie() {
+function getRandomMovie(): {
+  imdb_id: string;
+  title: string;
+  imdb_rating: number;
+} | null {
   const dbPath = path.resolve(process.cwd(), "imdb_media.db");
   const db = new Database(dbPath);
 
@@ -31,14 +35,22 @@ function getRandomMovie() {
       ORDER BY RANDOM()
       LIMIT 1;
     `);
-  const movie = stmt.get();
+  const movie = stmt.get() as {
+    imdb_id: string;
+    title: string;
+    imdb_rating: number;
+  } | null;
   db.close();
 
   return movie;
 }
 
 export async function GET() {
-  const movie = getRandomMovie();
+  const movie = getRandomMovie() as {
+    imdb_id: string;
+    title: string;
+    imdb_rating: number;
+  } | null;
 
   if (!movie) {
     return NextResponse.json(
