@@ -22,6 +22,18 @@ async def create_room():
             await room_manager.create_room(room_id)
             logger.info(f"Created room {room_id}")
             return {"room_id": room_id}
+
+@router.delete("/delete/{room_code}")
+async def delete_room(room_code: str): 
+    """
+    Delete a room with the given code.
+    """
+    if await room_manager.room_exists(room_code):
+        del room_manager.rooms[room_code]
+        logger.info(f"Deleted room {room_code}")
+        return {"message": "Room deleted successfully"}
+    else:
+        return {"message": "Room not found"}
         
 @router.get("/validate/{room_code}")
 async def validate_room(room_code: str):
@@ -32,6 +44,13 @@ async def validate_room(room_code: str):
         return {"exists": True}
     else:
         return {"exists": False}
+
+@router.get("/all")
+async def get_all_rooms():
+    """
+    Get a list of all rooms and their current states.
+    """
+    return room_manager.rooms
 
 @router.websocket("/join")
 async def websocket_endpoint(websocket: WebSocket):
