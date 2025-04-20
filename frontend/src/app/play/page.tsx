@@ -21,7 +21,11 @@ const Play = () => {
   useEffect(() => {
     const fetchMovie = async () => {
       try {
-        const res = await fetch("https://" + process.env.NEXT_PUBLIC_BACKEND_URL + "/random_movie");
+        const res = await fetch("/api/random");
+        console.log("Sending request to /api/random");
+        // const res = await fetch("https://" + process.env.NEXT_PUBLIC_BACKEND_URL + "/random_movie");
+        // console.log("Sending request to "+ process.env.NEXT_PUBLIC_BACKEND_URL + "/random_movie");
+
         // const res = await fetch("http://localhost:8000/random_movie");
         const data = await res.json();
         console.log(data)
@@ -64,8 +68,11 @@ const Play = () => {
 
   const skipRound = async () => {
       // const res = await fetch("/api/random");
-      const res = await fetch("https://" + process.env.NEXT_PUBLIC_BACKEND_URL + "/random_movie");
+      // const res = await fetch("https://" + process.env.NEXT_PUBLIC_BACKEND_URL + "/random_movie");
+      // console.log("Sending request to "+ process.env.NEXT_PUBLIC_BACKEND_URL + "/random_movie");
+      const res = await fetch("/api/random")
       const data = await res.json();
+      console.log("Sending request to /api/random");
       setCurrentMovie(data);
       setGuess("");         
       setSubmitted(false);  
