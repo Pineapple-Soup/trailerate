@@ -11,7 +11,7 @@ logger.setLevel(logging.INFO)
 router = APIRouter()
 room_manager = RoomManager()
 
-@router.post("/create-room")
+@router.post("/create")
 async def create_room():
     """
     Create a new room, generate a unique 4-digit ID, and initialize the room state.
@@ -22,8 +22,18 @@ async def create_room():
             await room_manager.create_room(room_id)
             logger.info(f"Created room {room_id}")
             return {"room_id": room_id}
+        
+@router.get("/validate/{room_code}")
+async def validate_room(room_code: str):
+    """
+    Validate if a room with the given code exists.
+    """
+    if await room_manager.room_exists(room_code):
+        return {"exists": True}
+    else:
+        return {"exists": False}
 
-@router.websocket("/room")
+@router.websocket("/join")
 async def websocket_endpoint(websocket: WebSocket):
     """
     WebSocket endpoint for players to join a room and receive updates.
