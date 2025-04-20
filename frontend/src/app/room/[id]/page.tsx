@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { Movie } from "@/types/Movie";
 import YoutubeEmbed from "@/components/YouTubeEmbed";
@@ -19,7 +19,6 @@ const Room = () => {
   const [actualScore, setActualScore] = useState(0);
   const [guess, setGuess] = useState("");
   const [currentMovie, setCurrentMovie] = useState<Movie | null>(null);
-  // const [messages, setMessages] = useState<string[]>([]);
 
   const showMessage = (message: string) => {
     const modal = document.createElement("div");
@@ -58,33 +57,7 @@ const Room = () => {
   useEffect(() => {
     const code = window.location.pathname.split("/").pop() || "";
     setRoomCode(code);
-    // fetch(
-    //   `https://${process.env.NEXT_PUBLIC_BACKEND_URL}/rooms/validate/${roomCode}`,
-    //   {
-    //     method: "GET",
-    //   }
-    // )
-    //   .then((response) => {
-    //     if (!response.ok) {
-    //       // router.push("/");
-    //       throw new Error("Failed to validate room code");
-    //     }
-    //     return response.json();
-    //   })
-    //   .then((data) => {
-    //     if (!data.exists) {
-    //       router.push("/");
-    //       throw new Error("Invalid room code");
-    //     }
-    //     console.log("Room validated:", data);
-    //     // Handle successful validation (e.g., navigate to the room)
-    //     // window.location.href = `/room/${roomCode}`;
-    //   })
-    //   .catch((error) => {
-    //     console.error(error);
-    //     // Handle validation error (e.g., show an error message)
-    //   });
-  }, [roomCode, router]);
+  }, [roomCode]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -121,7 +94,6 @@ const Room = () => {
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
       console.log("Socket message received:", data);
-      // console.log("Connected users:", data.data.connected_users);
       if (data.type === "user_join") {
         setUsers(data.data.connected_users);
       }
@@ -138,9 +110,7 @@ const Room = () => {
         setGameStarted(true);
         setRoundEnd(false);
         setCurrentRound(data.data.round);
-        console.log("Current round:", data.data.round);
         const movie = data.data.movie_data as Movie;
-        console.log("Movie data:", movie);
         setCurrentMovie(movie);
         showMessage(`Round ${data.data.round} has started!`);
       }
@@ -148,6 +118,9 @@ const Room = () => {
         setRoundEnd(true);
         setActualScore(data.data.correct_score * 10);
         setScoreBoard(data.data.scores);
+        setTimeout(() => {
+          setRoundEnd(false);
+        }, 5000);
       }
       if (data.type === "game_end") {
         setGameOver(true);
@@ -158,8 +131,6 @@ const Room = () => {
         setScoreBoard(data.data.scores);
       }
       showMessage(data.data.message);
-      // Message that all a user has joined
-      // setMessages((prevMessages) => [...prevMessages, data.message]);
     };
   }, [socket]);
 
@@ -266,15 +237,17 @@ const Room = () => {
           <h2 className='text-lg font-bold'>Game Over!</h2>
           <h3 className='text-xl font-bold mb-4'>Final Scoreboard:</h3>
           <ul className='list-disc list-inside'>
-            {scoreboard.map((entry, index) => (
+            {Object.entries(scoreboard).map(([playerName, score], index) => (
               <li key={index} className='font-liberation font-bold'>
-                {index + 1}. {entry.player_name}: {entry.score} points
+                {index + 1}. {playerName}: {score} points
               </li>
             ))}
           </ul>
           <button
             className='mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600'
-            onClick={() => router.push("/")}>
+            onClick={() => {
+              router.push("/");
+            }}>
             Back to Home
           </button>
         </div>
