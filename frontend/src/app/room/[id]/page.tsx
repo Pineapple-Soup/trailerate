@@ -2,6 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Movie } from "@/types/Movie";
+import YoutubeEmbed from "@/components/YouTubeEmbed";
 
 const Room = () => {
   const router = useRouter();
@@ -9,6 +11,14 @@ const Room = () => {
   const [username, setUsername] = useState("");
   const [socket, setSocket] = useState<WebSocket | null>(null);
   const [users, setUsers] = useState<Record<string, string>[]>([]);
+  const [gameStarted, setGameStarted] = useState(false);
+  const [gameOver, setGameOver] = useState(false);
+  const [currentRound, setCurrentRound] = useState(0);
+  const [roundEnd, setRoundEnd] = useState(false);
+  const [scoreboard, setScoreBoard] = useState<Record<string, number>[]>([]);
+  const [actualScore, setActualScore] = useState(0);
+  const [guess, setGuess] = useState("");
+  const [currentMovie, setCurrentMovie] = useState<Movie | null>(null);
   // const [messages, setMessages] = useState<string[]>([]);
 
   const showMessage = (message: string) => {
@@ -124,11 +134,51 @@ const Room = () => {
           )
         );
       }
+      if (data.type === "round_start") {
+        setGameStarted(true);
+        setRoundEnd(false);
+        setCurrentRound(data.data.round);
+        console.log("Current round:", data.data.movie);
+        setCurrentMovie(data.data.movie);
+        showMessage(`Round ${data.data.round} has started!`);
+      }
+      if (data.type === "round_end") {
+        setRoundEnd(true);
+        setActualScore(data.data.correct_score * 10);
+        setScoreBoard(data.data.scores);
+      }
+      if (data.type === "game_end") {
+        setGameOver(true);
+        setGameStarted(false);
+        setRoundEnd(false);
+        setCurrentRound(0);
+        setCurrentMovie(null);
+        setScoreBoard(data.data.scores);
+      }
       showMessage(data.data.message);
       // Message that all a user has joined
       // setMessages((prevMessages) => [...prevMessages, data.message]);
     };
   }, [socket]);
+
+  const getVideoId = (url: string): string | null => {
+    const match = url?.match(/v=([^&]+)/);
+    return match ? match[1] : null;
+  };
+
+  const videoId = getVideoId(currentMovie?.youtube_url || "");
+
+  const submitGuess = () => {
+    const guessNum = parseInt(guess);
+    socket?.send(
+      JSON.stringify({
+        type: "guess",
+        data: {
+          guess: guessNum,
+        },
+      })
+    );
+  };
 
   return (
     <div className='font-liberation flex flex-col items-center justify-center min-h-screen bg-gradient-to-t to-accent from-black text-white px-4'>
@@ -149,7 +199,50 @@ const Room = () => {
             </button>
           </form>
         </div>
-      ) : (
+      ) : gameStarted ? (
+        !roundEnd ? (
+          <div className='flex flex-col items-center'>
+            <h1 className='text-4xl font-bold mb-4'>Round {currentRound}</h1>
+            <h2 className='text-2xl mb-4'>
+              {currentMovie?.imdb_rating}
+              Guess the score of {currentMovie?.title || "Unknown Movie"}
+            </h2>
+            {videoId && <YoutubeEmbed videoId={videoId} />}
+            <input
+              type='number'
+              value={guess}
+              onChange={(e) => setGuess(e.target.value)}
+              placeholder='Your guess (0-100)'
+              className='p-2 rounded border text-white'
+            />
+            <button
+              onClick={submitGuess}
+              className='ml-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600'>
+              Submit
+            </button>
+          </div>
+        ) : (
+          <div className='flex flex-col items-center'>
+            <h1 className='text-4xl font-bold mb-4'>
+              Round {currentRound} Ended
+            </h1>
+            <h2 className='text-2xl mb-4'>Correct Score: {actualScore}</h2>
+            <h3 className='text-xl font-bold mb-4'>Scoreboard:</h3>
+            <ul className='list-disc list-inside'>
+              {scoreboard.map((entry, index) => (
+                <li key={index} className='font-liberation font-bold'>
+                  {index + 1}. {entry.player_name}: {entry.score} points
+                </li>
+              ))}
+            </ul>
+            <button
+              className='mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600'
+              onClick={() => setRoundEnd(false)}>
+              Continue
+            </button>
+          </div>
+        )
+      ) : !gameOver ? (
         <div className='mt-8 flex flex-col items-center'>
           <h2 className='text-lg font-bold'>Connected Users:</h2>
           <ul className='list-disc list-inside'>
@@ -164,6 +257,23 @@ const Room = () => {
             className='bg-accent px-4 py-2 text-white font-liberation rounded mt-4'
             onClick={readyUp}>
             Ready!
+          </button>
+        </div>
+      ) : (
+        <div className='mt-8 flex flex-col items-center'>
+          <h2 className='text-lg font-bold'>Game Over!</h2>
+          <h3 className='text-xl font-bold mb-4'>Final Scoreboard:</h3>
+          <ul className='list-disc list-inside'>
+            {scoreboard.map((entry, index) => (
+              <li key={index} className='font-liberation font-bold'>
+                {index + 1}. {entry.player_name}: {entry.score} points
+              </li>
+            ))}
+          </ul>
+          <button
+            className='mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600'
+            onClick={() => router.push("/")}>
+            Back to Home
           </button>
         </div>
       )}
