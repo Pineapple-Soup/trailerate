@@ -100,7 +100,7 @@ class RoomManager:
         # Broadcast results
         await self.broadcast(
             {
-                "type": "broadcast",
+                "type": "round_end",
                 "data": {
                     "message": "Round ended!",
                     "correct_score": correct_score,
