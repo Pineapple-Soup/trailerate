@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import Database from 'better-sqlite3';
 import path from 'path';
 
-const YOUTUBE_API_KEY = "REPLACE WITH KEY"
+const YOUTUBE_API_KEY = "AIzaSyCbDWqJ_wwN1QNw3y5xpPGLvGoPG34qz4E"
 
 async function fetchYouTubeTrailer(title: string): Promise<string | null> {
   const query = encodeURIComponent(`${title} trailer`);
@@ -20,20 +20,25 @@ async function fetchYouTubeTrailer(title: string): Promise<string | null> {
   return null;
 }
 
+function getRandomMovie() {
+    const dbPath = path.resolve(process.cwd(), 'imdb_media.db');
+    const db = new Database(dbPath);
+  
+    const stmt = db.prepare(`
+      SELECT imdb_id, title, imdb_rating
+      FROM media
+      WHERE youtube_url IS NULL
+      ORDER BY RANDOM()
+      LIMIT 1;
+    `);
+    const movie = stmt.get();
+    db.close();
+  
+    return movie;
+  }
+
 export async function GET() {
-  const dbPath = path.resolve(process.cwd(), 'imdb_media.db');
-  const db = new Database(dbPath);
-
-  // 1. Get a random movie that doesn't have a cached YouTube URL
-  const stmt = db.prepare(`
-    SELECT imdb_id, title, imdb_rating
-    FROM media
-    WHERE youtube_url IS NULL
-    ORDER BY RANDOM()
-    LIMIT 1;
-  `);
-
-  const movie = stmt.get();
+  const movie = getRandomMovie();
 
   if (!movie) {
     return NextResponse.json({ error: 'No uncached movies available' }, { status: 404 });
@@ -41,21 +46,21 @@ export async function GET() {
 
   const { imdb_id, title, imdb_rating } = movie;
 
-  // 2. Try to fetch a YouTube trailer
+  // fetch a YouTube trailer
   const youtubeUrl = await fetchYouTubeTrailer(title);
 
   if (!youtubeUrl) {
     return NextResponse.json({ error: 'No trailer found' }, { status: 404 });
   }
 
-  // 3. Save it to the DB
+  // Save it to the db
+  const db = new Database(path.resolve(process.cwd(), 'imdb_media.db'));
   const update = db.prepare(`
     UPDATE media
     SET youtube_url = ?
     WHERE imdb_id = ?;
   `);
   update.run(youtubeUrl, imdb_id);
-
   db.close();
 
   return NextResponse.json({

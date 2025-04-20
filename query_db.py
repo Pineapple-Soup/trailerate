@@ -17,7 +17,7 @@
 from googleapiclient.discovery import build
 import sqlite3
 
-YOUTUBE_API_KEY = "REPLACE WITH KEY"
+YOUTUBE_API_KEY = "REPLACE WITH KEY" #(doesnt really need it here anymore)
 
 def search_trailer(title):
     query = f"{title} trailer"
