@@ -44,7 +44,7 @@ const Room = () => {
   }, [socket]);
 
   return (
-    <div className='font-liberation flex flex-col items-center justify-center min-h-screen bg-gradient-to-t to-accent from-black text-white px-4'>
+    <div className='font-liberation flex flex-col items-center justify-center min-h-screen bg-gradient-to-t to-accent text-white px-4'>
       {!users.length && (
         <div>
           <div>Join the Room!</div>
