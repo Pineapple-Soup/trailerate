@@ -15,7 +15,7 @@ const Room = () => {
   const [gameOver, setGameOver] = useState(false);
   const [currentRound, setCurrentRound] = useState(0);
   const [roundEnd, setRoundEnd] = useState(false);
-  const [scoreboard, setScoreBoard] = useState<Record<string, number>[]>([]);
+  const [scoreboard, setScoreBoard] = useState<Record<string, number>>({});
   const [actualScore, setActualScore] = useState(0);
   const [guess, setGuess] = useState("");
   const [currentMovie, setCurrentMovie] = useState<Movie | null>(null);
@@ -138,8 +138,9 @@ const Room = () => {
         setGameStarted(true);
         setRoundEnd(false);
         setCurrentRound(data.data.round);
-        console.log("Current round:", data.data.movie);
-        const movie = data.data.movie as Movie;
+        console.log("Current round:", data.data.round);
+        const movie = data.data.movie_data as Movie;
+        console.log("Movie data:", movie);
         setCurrentMovie(movie);
         showMessage(`Round ${data.data.round} has started!`);
       }
@@ -230,9 +231,9 @@ const Room = () => {
             <h2 className='text-2xl mb-4'>Correct Score: {actualScore}</h2>
             <h3 className='text-xl font-bold mb-4'>Scoreboard:</h3>
             <ul className='list-disc list-inside'>
-              {scoreboard.map((entry, index) => (
+              {Object.entries(scoreboard).map(([playerName, score], index) => (
                 <li key={index} className='font-liberation font-bold'>
-                  {index + 1}. {entry.player_name}: {entry.score} points
+                  {index + 1}. {playerName}: {score} points
                 </li>
               ))}
             </ul>
