@@ -79,8 +79,9 @@ def get_random_movie():
 
     return {
         "title": title,
-        "year": year,
-        "rating": rating,
-        "type": media_type,
-        "trailer_url": youtube_url
+        # "year": year,
+        "imdb_rating": rating,
+        # "type": media_type,
+        # "youtube_url": youtube_url.split("v=")[-1]
+        "youtube_url": youtube_url
     }
