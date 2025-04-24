@@ -153,10 +153,10 @@ const Room = () => {
   };
 
   return (
-    <div className='font-liberation flex flex-col items-center justify-center min-h-screen bg-gradient-to-t to-accent from-black text-white px-4'>
+    <main className='flex items-center justify-center h-screen'>
       {!users.length ? (
-        <div>
-          <div>Join the Room!</div>
+        <div className='flex flex-col items-center relative z-10 p-8 rounded-2xl mx-auto  bg-white/10 border backdrop-blur border-white/30 shadow-lg'>
+          <h1 className='text-2xl font-bold'>Join the Room!</h1>
           <form onSubmit={handleSubmit} className='flex items-center space-x-4'>
             <input
               type='text'
@@ -248,7 +248,7 @@ const Room = () => {
           </Link>
         </div>
       )}
-    </div>
+    </main>
   );
 };
 

@@ -47,22 +47,15 @@ export default function Home() {
   };
 
   return (
-    <main className='min-h-screen text-white relative overflow-hidden'>
+    <main className='h-screen text-white relative overflow-hidden flex items-center justify-center'>
       {error && (
         <div className='font-liberation px-4 py-2 bg-accent text-white rounded-md'>
           {error}
         </div>
       )}
       <div
-        className='glass-container relative z-10 p-8 rounded-xl w-full max-w-xl mx-auto mt-12 text-center'
-        style={{
-          background: "rgba(255, 255, 255, 0.1)",
-          borderRadius: "16px",
-          boxShadow: "0 4px 30px rgba(0, 0, 0, 0.1)",
-          backdropFilter: "blur(8px)",
-          WebkitBackdropFilter: "blur(8px)",
-          border: "1px solid rgba(255, 255, 255, 0.2)",
-        }}>
+        className='relative z-10 p-8 rounded-2xl bg-white/10 border border-white/30 backdrop-blur shadow-lg'
+        style={{ WebkitBackdropFilter: "blur(8px)" }}>
         <div className='relative z-10 flex flex-col items-center space-y-8'>
           <Image
             src='/assets/logo.png'

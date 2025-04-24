@@ -92,9 +92,9 @@ const Play = () => {
 
   if (!currentMovie) {
     return (
-      <div className='font-liberation flex items-center justify-center h-screen bg-gradient-to-t to-accent text-white'>
+      <h1 className='text-3xl flex items-center justify-center h-screen text-white'>
         Loading trailer...
-      </div>
+      </h1>
     );
   }
 
@@ -104,87 +104,79 @@ const Play = () => {
   );
 
   return (
-    // <div className='font-liberation flex flex-col items-center justify-center min-h-screen bg-gradient-to-t to-accent text-white px-4'>
-    <div
-      className='relative z-10 p-8 rounded-xl w-full max-w-xl mx-auto mt-12 text-center'
-      style={{
-        background: "rgba(255, 255, 255, 0.1)",
-        borderRadius: "16px",
-        boxShadow: "0 4px 30px rgba(0, 0, 0, 0.1)",
-        backdropFilter: "blur(8px)",
-        WebkitBackdropFilter: "blur(8px)",
-        border: "1px solid rgba(255, 255, 255, 0.2)",
-      }}>
-      {!gameOver && (
-        <div className='flex flex-col items-center'>
-          <h1 className='text-4xl font-bold mb-4'>
-            Round {round}/{totalRounds}
-          </h1>
-          <h2 className='text-2xl mb-4'>
-            Guess the score of {currentMovie.title}
-          </h2>
-          {videoId && <YoutubeEmbed videoId={videoId} />}
-        </div>
-      )}
-
-      {!submitted && !gameOver && (
-        <div className='mt-6'>
-          <input
-            type='number'
-            value={guess}
-            onChange={(e) => setGuess(e.target.value)}
-            placeholder='Your guess (0-100)'
-            className='p-2 rounded border text-white'
-          />
-          <button
-            onClick={handleSubmit}
-            className='ml-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600'>
-            Submit
-          </button>
-          <button
-            onClick={skipRound}
-            className='mt-4 ml-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600'>
-            Skip
-          </button>
-        </div>
-      )}
-
-      {submitted && !gameOver && (
-        <div className='flex flex-col justify-center items-center mt-6'>
-          <p className='text-xl'>You Guessed: {guess}%</p>
-          <p className='text-xl'>Actual Score: {actualScore}%</p>
-          {/* <p className='text-xl'>
-            Actual Score: {Math.round(currentMovie.imdb_rating * 10)}%
-          </p> */}
-
-          <p className='text-lg'>You earned {roundScore} points this round.</p>
-          <button
-            onClick={nextRound}
-            className='mt-4 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600'>
-            Next Round
-          </button>
-        </div>
-      )}
-
-      {gameOver && (
-        <div className='flex flex-col justify-center items-center mt-6'>
-          <h2 className='text-3xl font-bold'>Game Over!</h2>
-          <p className='text-xl mt-2'>Your total score: {totalScore}</p>
-          <div className='flex flex-col items-center justify-center gap-4 mt-4'>
-            <button
-              onClick={replayGame}
-              className='flex items-center justify-center rounded-md px-4 py-2 bg-accent hover:bg-white hover:text-accent font-bold'>
-              Replay
-            </button>
-            <Link
-              href='/'
-              className='flex items-center justify-center rounded-md px-4 py-2 bg-accent hover:bg-white hover:text-accent font-bold'>
-              Main Menu
-            </Link>
+    <main className='flex items-center justify-center h-screen'>
+      <div
+        className=' z-10 p-8 rounded-2xl text-center bg-white/10 border backdrop-blur border-white/30 shadow-lg'
+        style={{ WebkitBackdropFilter: "blur(8px)" }}>
+        {!gameOver && (
+          <div className='flex flex-col items-center'>
+            <h1 className='text-4xl font-bold mb-4'>
+              Round {round}/{totalRounds}
+            </h1>
+            <h2 className='text-2xl mb-4'>
+              Guess the score of {currentMovie.title}
+            </h2>
+            {videoId && <YoutubeEmbed videoId={videoId} />}
           </div>
-        </div>
-      )}
-    </div>
+        )}
+        {!submitted && !gameOver && (
+          <div className='mt-6'>
+            <input
+              type='number'
+              value={guess}
+              onChange={(e) => setGuess(e.target.value)}
+              placeholder='Your guess (0-100)'
+              className='p-2 rounded border text-white'
+            />
+            <button
+              onClick={handleSubmit}
+              className='ml-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600'>
+              Submit
+            </button>
+            <button
+              onClick={skipRound}
+              className='mt-4 ml-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600'>
+              Skip
+            </button>
+          </div>
+        )}
+        {submitted && !gameOver && (
+          <div className='flex flex-col justify-center items-center mt-6'>
+            <p className='text-xl'>You Guessed: {guess}%</p>
+            <p className='text-xl'>Actual Score: {actualScore}%</p>
+            {/* <p className='text-xl'>
+              Actual Score: {Math.round(currentMovie.imdb_rating * 10)}%
+            </p> */}
+            <p className='text-lg'>
+              You earned {roundScore} points this round.
+            </p>
+            <button
+              onClick={nextRound}
+              className='mt-4 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600'>
+              Next Round
+            </button>
+          </div>
+        )}
+        {gameOver && (
+          <div className='flex flex-col justify-center items-center mt-6'>
+            <h2 className='text-3xl font-bold'>Game Over!</h2>
+            <p className='text-xl mt-2'>Your total score: {totalScore}</p>
+            <div className='flex flex-col items-center justify-center gap-4 mt-4'>
+              <button
+                onClick={replayGame}
+                className='flex items-center justify-center rounded-md px-4 py-2 bg-accent hover:bg-white hover:text-accent font-bold'>
+                Replay
+              </button>
+              <Link
+                href='/'
+                className='flex items-center justify-center rounded-md px-4 py-2 bg-accent hover:bg-white hover:text-accent font-bold'>
+                Main Menu
+              </Link>
+            </div>
+          </div>
+        )}
+      </div>
+    </main>
   );
 };
 
