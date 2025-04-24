@@ -1,12 +1,11 @@
 "use client";
 
-import { useRouter } from "next/router";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Movie } from "@/types/Movie";
 import YoutubeEmbed from "@/components/YouTubeEmbed";
 
 const Room = () => {
-  const router = useRouter();
   const [roomCode, setRoomCode] = useState("");
   const [username, setUsername] = useState("");
   const [socket, setSocket] = useState<WebSocket | null>(null);
@@ -243,13 +242,11 @@ const Room = () => {
               </li>
             ))}
           </ul>
-          <button
+          <Link
             className='mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600'
-            onClick={() => {
-              router.push("/");
-            }}>
+            href='/'>
             Back to Home
-          </button>
+          </Link>
         </div>
       )}
     </div>
