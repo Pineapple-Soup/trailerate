@@ -6,14 +6,22 @@ import Script from "next/script";
 
 declare global {
   interface Window {
-    VANTA: any;
-    THREE: any;
+    VANTA: {
+      WAVES: (options: Record<string, unknown>) => { destroy: () => void };
+    };
+    THREE: object;
   }
 }
 
-export default function VantaWrapper({ children }: { children: React.ReactNode }) {
+export default function VantaWrapper({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const vantaRef = useRef(null);
-  const [vantaEffect, setVantaEffect] = useState<any>(null);
+  const [vantaEffect, setVantaEffect] = useState<{
+    destroy: () => void;
+  } | null>(null);
 
   useEffect(() => {
     let retries = 0;
@@ -50,18 +58,17 @@ export default function VantaWrapper({ children }: { children: React.ReactNode }
   return (
     <>
       <Script
-        src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"
-        strategy="beforeInteractive"
+        src='https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js'
+        strategy='beforeInteractive'
       />
       <Script
-        src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.waves.min.js"
-        strategy="beforeInteractive"
+        src='https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.waves.min.js'
+        strategy='beforeInteractive'
       />
       <main
         ref={vantaRef}
-        className="min-h-screen w-full text-white relative overflow-hidden"
-      >
-        <div className="relative z-10">{children}</div>
+        className='min-h-screen w-full text-white relative overflow-hidden'>
+        <div className='relative z-10'>{children}</div>
       </main>
     </>
   );

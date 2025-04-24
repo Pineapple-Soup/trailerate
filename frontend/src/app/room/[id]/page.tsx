@@ -1,15 +1,23 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useEffect, useState } from "react";
+import { Movie } from "@/types/Movie";
+import YoutubeEmbed from "@/components/YouTubeEmbed";
 
 const Room = () => {
-  const router = useRouter();
   const [roomCode, setRoomCode] = useState("");
   const [username, setUsername] = useState("");
   const [socket, setSocket] = useState<WebSocket | null>(null);
   const [users, setUsers] = useState<Record<string, string>[]>([]);
-  // const [messages, setMessages] = useState<string[]>([]);
+  const [gameStarted, setGameStarted] = useState(false);
+  const [gameOver, setGameOver] = useState(false);
+  const [currentRound, setCurrentRound] = useState(0);
+  const [roundEnd, setRoundEnd] = useState(false);
+  const [scoreboard, setScoreBoard] = useState<Record<string, number>>({});
+  const [actualScore, setActualScore] = useState(0);
+  const [guess, setGuess] = useState("");
+  const [currentMovie, setCurrentMovie] = useState<Movie | null>(null);
 
   const showMessage = (message: string) => {
     const modal = document.createElement("div");
@@ -48,33 +56,7 @@ const Room = () => {
   useEffect(() => {
     const code = window.location.pathname.split("/").pop() || "";
     setRoomCode(code);
-    // fetch(
-    //   `https://${process.env.NEXT_PUBLIC_BACKEND_URL}/rooms/validate/${roomCode}`,
-    //   {
-    //     method: "GET",
-    //   }
-    // )
-    //   .then((response) => {
-    //     if (!response.ok) {
-    //       // router.push("/");
-    //       throw new Error("Failed to validate room code");
-    //     }
-    //     return response.json();
-    //   })
-    //   .then((data) => {
-    //     if (!data.exists) {
-    //       router.push("/");
-    //       throw new Error("Invalid room code");
-    //     }
-    //     console.log("Room validated:", data);
-    //     // Handle successful validation (e.g., navigate to the room)
-    //     // window.location.href = `/room/${roomCode}`;
-    //   })
-    //   .catch((error) => {
-    //     console.error(error);
-    //     // Handle validation error (e.g., show an error message)
-    //   });
-  }, [roomCode, router]);
+  }, [roomCode]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -111,7 +93,6 @@ const Room = () => {
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
       console.log("Socket message received:", data);
-      // console.log("Connected users:", data.data.connected_users);
       if (data.type === "user_join") {
         setUsers(data.data.connected_users);
       }
@@ -124,17 +105,58 @@ const Room = () => {
           )
         );
       }
+      if (data.type === "round_start") {
+        setGameStarted(true);
+        setRoundEnd(false);
+        setCurrentRound(data.data.round);
+        const movie = data.data.movie_data as Movie;
+        setCurrentMovie(movie);
+        showMessage(`Round ${data.data.round} has started!`);
+      }
+      if (data.type === "round_end") {
+        setRoundEnd(true);
+        setActualScore(data.data.correct_score * 10);
+        setScoreBoard(data.data.scores);
+        setTimeout(() => {
+          setRoundEnd(false);
+        }, 5000);
+      }
+      if (data.type === "game_end") {
+        setGameOver(true);
+        setGameStarted(false);
+        setRoundEnd(false);
+        setCurrentRound(0);
+        setCurrentMovie(null);
+        setScoreBoard(data.data.scores);
+      }
       showMessage(data.data.message);
-      // Message that all a user has joined
-      // setMessages((prevMessages) => [...prevMessages, data.message]);
     };
   }, [socket]);
 
+  const getVideoId = (url: string): string | null => {
+    const match = url?.match(/v=([^&]+)/);
+    return match ? match[1] : null;
+  };
+
+  const videoId = getVideoId(currentMovie?.youtube_url || "");
+
+  const submitGuess = () => {
+    const guessNum = parseInt(guess);
+    socket?.send(
+      JSON.stringify({
+        type: "guess",
+        data: {
+          guess: guessNum,
+        },
+      })
+    );
+  };
+
   return (
-    <div className='font-liberation flex flex-col items-center justify-center min-h-screen bg-gradient-to-t to-accent from-black text-white px-4'>
+    <main className='flex items-center justify-center h-screen'>
       {!users.length ? (
-        <div>
-          <div>Join the Room!</div>
+        <div className='flex flex-col items-center relative z-10 p-8 rounded-2xl mx-auto  bg-white/10 border backdrop-blur border-white/30 shadow-lg'>
+          <h1 className='text-2xl font-bold'>Join the Room!</h1>
           <form onSubmit={handleSubmit} className='flex items-center space-x-4'>
             <input
               type='text'
@@ -149,7 +171,49 @@ const Room = () => {
             </button>
           </form>
         </div>
-      ) : (
+      ) : gameStarted ? (
+        !roundEnd ? (
+          <div className='flex flex-col items-center'>
+            <h1 className='text-4xl font-bold mb-4'>Round {currentRound}</h1>
+            <h2 className='text-2xl mb-4'>
+              Guess the score of {currentMovie?.title || "Unknown Movie"}
+            </h2>
+            {videoId && <YoutubeEmbed videoId={videoId} />}
+            <input
+              type='number'
+              value={guess}
+              onChange={(e) => setGuess(e.target.value)}
+              placeholder='Your guess (0-100)'
+              className='p-2 rounded border text-white'
+            />
+            <button
+              onClick={submitGuess}
+              className='ml-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600'>
+              Submit
+            </button>
+          </div>
+        ) : (
+          <div className='flex flex-col items-center'>
+            <h1 className='text-4xl font-bold mb-4'>
+              Round {currentRound} Ended
+            </h1>
+            <h2 className='text-2xl mb-4'>Correct Score: {actualScore}</h2>
+            <h3 className='text-xl font-bold mb-4'>Scoreboard:</h3>
+            <ul className='list-disc list-inside'>
+              {Object.entries(scoreboard).map(([playerName, score], index) => (
+                <li key={index} className='font-liberation font-bold'>
+                  {index + 1}. {playerName}: {score} points
+                </li>
+              ))}
+            </ul>
+            <button
+              className='mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600'
+              onClick={() => setRoundEnd(false)}>
+              Continue
+            </button>
+          </div>
+        )
+      ) : !gameOver ? (
         <div className='mt-8 flex flex-col items-center'>
           <h2 className='text-lg font-bold'>Connected Users:</h2>
           <ul className='list-disc list-inside'>
@@ -166,8 +230,25 @@ const Room = () => {
             Ready!
           </button>
         </div>
+      ) : (
+        <div className='mt-8 flex flex-col items-center'>
+          <h2 className='text-lg font-bold'>Game Over!</h2>
+          <h3 className='text-xl font-bold mb-4'>Final Scoreboard:</h3>
+          <ul className='list-disc list-inside'>
+            {Object.entries(scoreboard).map(([playerName, score], index) => (
+              <li key={index} className='font-liberation font-bold'>
+                {index + 1}. {playerName}: {score} points
+              </li>
+            ))}
+          </ul>
+          <Link
+            className='mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600'
+            href='/'>
+            Back to Home
+          </Link>
+        </div>
       )}
-    </div>
+    </main>
   );
 };
 
