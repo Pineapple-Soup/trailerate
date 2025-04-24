@@ -5,7 +5,6 @@ import YoutubeEmbed from "@/components/YouTubeEmbed";
 import { Movie } from "@/types/Movie";
 import Link from "next/link";
 
-
 const totalRounds = 3;
 
 const Play = () => {
@@ -26,11 +25,8 @@ const Play = () => {
         // const res = await fetch("https://" + process.env.NEXT_PUBLIC_BACKEND_URL + "/random_movie");
         // console.log("Sending request to "+ process.env.NEXT_PUBLIC_BACKEND_URL + "/random_movie");
 
-        // const res = await fetch("http://localhost:8000/random_movie");
         const data = await res.json();
-        console.log(data)
         setCurrentMovie(data);
-        console.log(currentMovie)
       } catch (err) {
         console.error("Failed to fetch movie:", err);
       }
@@ -67,16 +63,16 @@ const Play = () => {
   };
 
   const skipRound = async () => {
-      // const res = await fetch("/api/random");
-      // const res = await fetch("https://" + process.env.NEXT_PUBLIC_BACKEND_URL + "/random_movie");
-      // console.log("Sending request to "+ process.env.NEXT_PUBLIC_BACKEND_URL + "/random_movie");
-      const res = await fetch("/api/random")
-      const data = await res.json();
-      console.log("Sending request to /api/random");
-      setCurrentMovie(data);
-      setGuess("");         
-      setSubmitted(false);  
-      setRoundScore(0);     
+    // const res = await fetch("/api/random");
+    // const res = await fetch("https://" + process.env.NEXT_PUBLIC_BACKEND_URL + "/random_movie");
+    // console.log("Sending request to "+ process.env.NEXT_PUBLIC_BACKEND_URL + "/random_movie");
+    const res = await fetch("/api/random");
+    const data = await res.json();
+    console.log("Sending request to /api/random");
+    setCurrentMovie(data);
+    setGuess("");
+    setSubmitted(false);
+    setRoundScore(0);
   };
 
   const replayGame = () => {
@@ -86,7 +82,7 @@ const Play = () => {
     setTotalScore(0);
     setSubmitted(false);
     setGameOver(false);
-    setCurrentMovie(null); 
+    setCurrentMovie(null);
   };
 
   const getVideoId = (url: string): string | null => {
@@ -108,10 +104,9 @@ const Play = () => {
   );
 
   return (
-    
     // <div className='font-liberation flex flex-col items-center justify-center min-h-screen bg-gradient-to-t to-accent text-white px-4'>
     <div
-      className="relative z-10 p-8 rounded-xl w-full max-w-xl mx-auto mt-12 text-center"
+      className='relative z-10 p-8 rounded-xl w-full max-w-xl mx-auto mt-12 text-center'
       style={{
         background: "rgba(255, 255, 255, 0.1)",
         borderRadius: "16px",
@@ -119,8 +114,7 @@ const Play = () => {
         backdropFilter: "blur(8px)",
         WebkitBackdropFilter: "blur(8px)",
         border: "1px solid rgba(255, 255, 255, 0.2)",
-      }}
-    >
+      }}>
       {!gameOver && (
         <div className='flex flex-col items-center'>
           <h1 className='text-4xl font-bold mb-4'>
@@ -183,15 +177,13 @@ const Play = () => {
               Replay
             </button>
             <Link
-              href="/"
-              className='flex items-center justify-center rounded-md px-4 py-2 bg-accent hover:bg-white hover:text-accent font-bold'
-            >
+              href='/'
+              className='flex items-center justify-center rounded-md px-4 py-2 bg-accent hover:bg-white hover:text-accent font-bold'>
               Main Menu
             </Link>
           </div>
         </div>
       )}
-
     </div>
   );
 };
