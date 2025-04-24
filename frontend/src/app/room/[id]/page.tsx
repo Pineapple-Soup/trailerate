@@ -176,7 +176,6 @@ const Room = () => {
           <div className='flex flex-col items-center'>
             <h1 className='text-4xl font-bold mb-4'>Round {currentRound}</h1>
             <h2 className='text-2xl mb-4'>
-              {currentMovie?.imdb_rating}
               Guess the score of {currentMovie?.title || "Unknown Movie"}
             </h2>
             {videoId && <YoutubeEmbed videoId={videoId} />}
