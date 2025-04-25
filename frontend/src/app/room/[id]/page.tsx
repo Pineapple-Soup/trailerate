@@ -62,7 +62,7 @@ const Room = () => {
     e.preventDefault();
     console.log("Joining room with code:", roomCode);
     const socket = new WebSocket(
-      `wss://${process.env.NEXT_PUBLIC_BACKEND_URL}/rooms/join`
+      `${process.env.WS_URL}/rooms/join`
     );
     console.log("Socket connected:", socket);
     socket.onopen = () => {

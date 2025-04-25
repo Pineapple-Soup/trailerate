@@ -19,7 +19,7 @@ export default function Home() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     fetch(
-      `https://${process.env.NEXT_PUBLIC_BACKEND_URL}/rooms/validate/${roomCode}`,
+      `${process.env.HTTP_URL}/rooms/validate/${roomCode}`,
       {
         method: "GET",
       }
