@@ -45,6 +45,14 @@ async def validate_room(room_code: str):
         return {"exists": True}
     else:
         return {"exists": False}
+    
+@router.get("/all")
+async def get_all_rooms():
+    """
+    Get a list of all rooms and their states.
+    """
+    return room_manager.rooms
+
 
 
 @router.websocket("/join")
